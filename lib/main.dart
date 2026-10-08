@@ -297,6 +297,10 @@ class _LoginPageState extends State<LoginPage> {
     if (resultado['estado'] == 'OK') {
       final usuario = resultado['usuario'];
       final rolUsuario = usuario['rol'];
+
+      debugPrint('ROL GUARDADO EN MARIADB: $rolUsuario');
+      debugPrint('ROL SELECCIONADO EN FLUTTER: $role');
+
 if (rolUsuario != role) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -374,7 +378,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
+  
+  String tipoUsuario = 'Cliente';
   
   @override
   Widget build(BuildContext context) {
@@ -426,6 +431,35 @@ TextField(
     prefixIcon: Icon(Icons.lock_outline),
   ),
 ),
+
+const SizedBox(height: 15),
+
+DropdownButtonFormField<String>(
+  initialValue: tipoUsuario,
+  decoration: const InputDecoration(
+    labelText: 'Tipo de usuario',
+    prefixIcon: Icon(Icons.people_outline),
+    border: OutlineInputBorder(),
+  ),
+  items: const [
+    DropdownMenuItem(
+      value: 'Cliente',
+      child: Text('Cliente'),
+    ),
+    DropdownMenuItem(
+      value: 'Mecánico',
+      child: Text('Mecánico'),
+    ),
+  ],
+  onChanged: (valor) {
+    if (valor != null) {
+      setState(() {
+        tipoUsuario = valor;
+      });
+    }
+  },
+),
+
             const SizedBox(height: 15),
             const SizedBox(height: 25),
             SizedBox(
@@ -451,7 +485,7 @@ TextField(
       nombre,
       email,
       password,
-      'Cliente',
+      tipoUsuario,
     );
 
     if (!mounted) return;
@@ -2428,8 +2462,15 @@ class _BatteryPageState extends State<BatteryPage> {
   void initState() {
     super.initState();
 
-    vehiculosFuture = ApiService.obtenerVehiculos();
-    }
+  if (SesionUsuario.id == null) {
+    vehiculosFuture = Future.value([]);
+  } else {
+    vehiculosFuture = ApiService.obtenerVehiculosPorUsuario(
+      SesionUsuario.id!,
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

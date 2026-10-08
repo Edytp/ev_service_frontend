@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000';
+    static const String baseUrl = 'http://10.10.10.83:5000';
 
   static Future<List<dynamic>> obtenerUsuarios() async {
     final response = await http.get(
